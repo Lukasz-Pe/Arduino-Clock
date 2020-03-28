@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>
-//#include <Adafruit_LiquidCrystal.h>
+
 byte spg[8] = {
   0b00011,
   0b00111,
@@ -60,15 +60,15 @@ byte kd[8] = {
   0b11111,
   0b11111
 };
-byte pr[8] = {
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111
+byte st[8] = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000
 };
 byte ks[8] = {
   0b00000,
@@ -89,7 +89,7 @@ void CreateCustomChar(LiquidCrystal& lcd){
   lcd.createChar(3, sld); //lcd.write(byte(3));
   lcd.createChar(4, kg); //lcd.write(byte(4));
   lcd.createChar(5, kd); //lcd.write(byte(5));
-  lcd.createChar(6, pr); //lcd.write(byte(6));
+  lcd.createChar(6, st); //lcd.write(byte(6));
   lcd.createChar(7, ks); //lcd.write(byte(7));
   lcd.clear();
 }
@@ -134,7 +134,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.write(byte(7));
       lcd.write(byte(4));
       lcd.setCursor(p, 2);
-      lcd.write(byte(6));   
+      lcd.write(255);   
       lcd.write(byte(5));   
       lcd.write(byte(2));
     break;
@@ -146,7 +146,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.setCursor(p, 1);
       lcd.write(byte(7));   
       lcd.write(byte(7));   
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.setCursor(p, 2);
       lcd.write(byte(2));   
       lcd.write(byte(5));   
@@ -160,7 +160,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.setCursor(p, 1);
       lcd.write(byte(4));
       lcd.write(byte(7));   
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.setCursor(p, 2);
       lcd.print(" ");
       lcd.print(" ");
@@ -168,7 +168,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
     break;
     case 5:
       lcd.setCursor(p, 0);
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.write(byte(4));   
       lcd.write(byte(4));
       lcd.setCursor(p, 1);
@@ -186,7 +186,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.write(byte(4));   
       lcd.write(byte(1));
       lcd.setCursor(p, 1);
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.write(byte(2));
       lcd.write(byte(5));
       lcd.setCursor(p, 2);
@@ -198,7 +198,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.setCursor(p, 0);
       lcd.write(byte(3));
       lcd.write(byte(4));   
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.setCursor(p, 1);
       lcd.write(byte(5));
       lcd.write(byte(0));
@@ -214,9 +214,9 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.write(byte(4));   
       lcd.write(byte(2));
       lcd.setCursor(p, 1);
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.write(byte(7));
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.setCursor(p, 2);
       lcd.write(byte(1));   
       lcd.write(byte(5));   
@@ -230,7 +230,7 @@ void buildNum(LiquidCrystal& lcd,const int& p, const int& i){
       lcd.setCursor(p, 1);
       lcd.write(byte(4));
       lcd.write(byte(7));   
-      lcd.write(byte(6));
+      lcd.write(255);
       lcd.setCursor(p, 2);
       lcd.write(byte(2));
       lcd.write(byte(5));
@@ -249,25 +249,25 @@ void showNum(LiquidCrystal& lcd,const int& pos, const int& num){
 
 void dzienTygodnia(LiquidCrystal& lcd, const int& i){
   switch(i){
-    case 1:
+    case 7:
       lcd.print("Nd");
     break;
-    case 2:
+    case 1:
       lcd.print("Pn");
     break;
-    case 3:
+    case 2:
       lcd.print("Wt");
     break;
-    case 4:
+    case 3:
       lcd.print("Sr");
     break;
-    case 5:
+    case 4:
       lcd.print("Cz");
     break;
-    case 6:
+    case 5:
       lcd.print("Pt");
     break;
-    case 7:
+    case 6:
       lcd.print("So");
     break;
   }

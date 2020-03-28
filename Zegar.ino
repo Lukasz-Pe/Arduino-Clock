@@ -1,18 +1,18 @@
-//#include <LiquidCrystal.h>
 #include "bigChar.h"
-#include "time.h"
 #include "ClickEncoder.h"
 #include "TimerOne.h"
-
+#include<DS3231.h>
 
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
 const int  beep = 37, ent = 35, rl = 33, rr = 31, res = 41;
 const int rs = 16, en = 17, d4 = 23, d5 = 25, d6 = 27, d7 = 29;
+DS3231 rtc(SDA,SCL);
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 //Adafruit_LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 int g=0,m=0,s=0,dzi=1,mie=1,rok=2020;
 int p=0;
+Time t;
 
 //Zmienne dla menu
 int i=0;
@@ -26,7 +26,7 @@ bool down = false;
 bool middle = false;
 int lastSec=s;
 
-//Tekty dla menu:
+//Teksty dla menu:
 String menuItem[] = {"Ustaw rok","Ustaw m-c","Ustaw dzien","Ustaw godzine","Ustaw minute","Ustaw sekunde","Wyjdz"};
 int menuItemSize=sizeof(menuItem)/sizeof(String);
 
@@ -39,6 +39,7 @@ void timerIsr() {
 }
 
 void setup() {
+  rtc.begin();
   //ustawienie enkodera
   encoder = new ClickEncoder(rl, rr, ent);
   encoder->setAccelerationEnabled(false);
@@ -50,7 +51,7 @@ void setup() {
   
   lcd.begin(20,4);
   CreateCustomChar(lcd);
-  setTime(g, m, s, dzi, mie, rok);
+  //setTime(g, m, s, dzi, mie, rok);
   // Print a message to the LCD.
   //pinMode(ent, INPUT_PULLUP);
   //pinMode(rl, INPUT_PULLUP);
@@ -68,11 +69,12 @@ void menuSelect();
 void readRotaryEncoder();
 void showValue(const int& item, const int& pos, const bool& active=false);
 void changeValue();
+bool leapYear(const int& year);
 
 void showTime(){
     p=0;
-  showNum(lcd,p,hour());
-  if(second()%2==0){
+  showNum(lcd,p,t.hour);
+  if(t.sec%2==0){
     lcd.setCursor(6,1);
     lcd.print(" ");
     lcd.setCursor(6,0);
@@ -88,8 +90,8 @@ void showTime(){
     lcd.write(byte(7));
   }
   p+=7;
-  showNum(lcd,p,minute());
-  if(second()%2!=0){
+  showNum(lcd,p,t.min);
+  if(t.sec%2!=0){
     lcd.setCursor(13,1);
     lcd.print(" ");
     lcd.setCursor(13,0);
@@ -105,21 +107,30 @@ void showTime(){
     lcd.write(byte(7));
   }
   p+=7;
-  showNum(lcd,p,second());
+  showNum(lcd,p,t.sec);
   lcd.setCursor(0,3);
-  dzienTygodnia(lcd, weekday());
+  dzienTygodnia(lcd, t.dow);
   lcd.print(", ");
-  lcd.print(day());
-  lcd.setCursor(8,3);
-  miesiac(lcd, month());
-  lcd.setCursor(14,3);
-  lcd.print(year());
+  if(t.date<10){
+    lcd.print("0");
+  }
+  lcd.print(t.date);
+  lcd.setCursor(7,3);
+  miesiac(lcd, t.mon);
+  lcd.setCursor(13,3);
+//  lcd.print(t.year);
+//  lcd.setCursor(15,3);
+//  lcd.print("T=");
+  lcd.print(rtc.getTemp());
+  lcd.print((char)223);
+  lcd.print("C");
 }
 
 bool menu=false;
 int option=-1;
 
 void loop() {
+  t=rtc.getTime();
   ClickEncoder::Button b = encoder->getButton();
   if(b != ClickEncoder::Open){
     middle=true;
@@ -158,7 +169,7 @@ void mainMenu(){
     }
     lcd.setCursor(7,0);
     lcd.print("MENU");
-    if(lastSec!=second()){
+    if(lastSec!=t.sec){
       lcd.clear();
         int prev=0, next=0;
         if((menuitem-1)<0){
@@ -177,7 +188,7 @@ void mainMenu(){
         showValue(menuitem,2);
         displayMenuItem(menuItem[next],0,3,false);
         showValue(next,3);
-      lastSec=second();
+      lastSec=t.sec;
     }
     if(middle){
       if(menuitem!=6){
@@ -213,7 +224,8 @@ void mainMenu(){
         showValue(next,3);
     }
     if(middle){
-      setTime(g, m, s, dzi, mie, rok);
+      rtc.setTime(g, m, s);
+      rtc.setDate(dzi, mie, rok);
       page=1;
     }
   }
@@ -253,15 +265,15 @@ void showValue(const int& item, const int& pos, const bool& active=false){
   if(page==1){
     switch(item){
       case 0:
-        rok=year();
+        rok=t.year;
         lcd.print(rok);
       break;
       case 1:
-        mie=month();
+        mie=t.mon;
         miesiac(lcd,mie);
       break;
       case 2:
-        dzi=day();
+        dzi=t.date;
         if(dzi<10){
           lcd.print("0");
           lcd.print(dzi);
@@ -270,7 +282,7 @@ void showValue(const int& item, const int& pos, const bool& active=false){
         }
       break;
       case 3:
-        g=hour();
+        g=t.hour;
         if(g<10){
           lcd.print("0");
           lcd.print(g);
@@ -279,7 +291,7 @@ void showValue(const int& item, const int& pos, const bool& active=false){
         }
       break;
       case 4:
-        m=minute();
+        m=t.min;
         if(m<10){
           lcd.print("0");
           lcd.print(m);
@@ -288,7 +300,7 @@ void showValue(const int& item, const int& pos, const bool& active=false){
         }
       break;
       case 5:
-        s=second();
+        s=t.sec;
         if(s<10){
           lcd.print("0");
           lcd.print(s);
@@ -340,22 +352,23 @@ void showValue(const int& item, const int& pos, const bool& active=false){
             if(dzi<0){
               dzi=31;
             }else if(dzi>31){
-              dzi=0;
+              dzi=1;
             }
             break;
           case 2:
-            if(dzi<0&&!leapYear(year())){
-              dzi=28;
-            }else{
-              dzi=29;
-            }
-            if(!leapYear(year())){
-              if(dzi>28){
-                dzi=0;
+            if(leapYear(t.year)){
+              if(dzi>29){
+                dzi=1;
+              }
+              if(dzi<0){
+                dzi=29;
               }
             }else{
-              if(dzi>29){
-                dzi=0;
+              if(dzi>28){
+                dzi=1;
+              }
+              if(dzi<1){
+                dzi=28;
               }
             }
             break;
@@ -366,7 +379,7 @@ void showValue(const int& item, const int& pos, const bool& active=false){
             if(dzi<0){
               dzi=30;
             }else if(dzi>30){
-              dzi=0;
+              dzi=1;
             }
             break;
         }
@@ -436,4 +449,14 @@ void showValue(const int& item, const int& pos, const bool& active=false){
       break;
     }
   }
+}
+
+bool leapYear(const int& year){
+  if(year%4==0&&year%100!=0){
+    return true;
+  }
+  if(year%400==0){
+    return true;
+  }
+  return false;
 }
