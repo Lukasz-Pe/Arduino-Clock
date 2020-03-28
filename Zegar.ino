@@ -9,7 +9,6 @@ const int  beep = 37, ent = 35, rl = 33, rr = 31, res = 41;
 const int rs = 16, en = 17, d4 = 23, d5 = 25, d6 = 27, d7 = 29;
 DS3231 rtc(SDA,SCL);
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-//Adafruit_LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 int g=0,m=0,s=0,dzi=1,mie=1,rok=2020;
 int p=0;
 Time t;
@@ -226,6 +225,7 @@ void mainMenu(){
     if(middle){
       rtc.setTime(g, m, s);
       rtc.setDate(dzi, mie, rok);
+      rtc.setDOW();
       page=1;
     }
   }
