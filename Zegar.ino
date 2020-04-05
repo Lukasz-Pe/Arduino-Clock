@@ -151,6 +151,7 @@ void loop() {
     }
     if((t.hour==0)&&(t.min==0)&&(t.sec==0)/*||(digitalRead(res)==LOW)*/){
       //digitalWrite(beep,HIGH);
+      delay(995);
       resetFunc();
     }
   }else{
