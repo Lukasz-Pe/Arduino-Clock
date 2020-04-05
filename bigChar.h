@@ -276,40 +276,40 @@ void dzienTygodnia(LiquidCrystal& lcd, const int& i){
 void miesiac(LiquidCrystal& lcd, const int& i){
   switch(i){
     case 1:
-      lcd.print("I");
+      lcd.print("I   ");
     break;
     case 2:
-      lcd.print("II");
+      lcd.print("II  ");
     break;
     case 3:
-      lcd.print("III");
+      lcd.print("III ");
     break;
     case 4:
-      lcd.print("IV");
+      lcd.print("IV  ");
     break;
     case 5:
-      lcd.print("V");
+      lcd.print("V   ");
     break;
     case 6:
-      lcd.print("VI");
+      lcd.print("VI  ");
     break;
     case 7:
-      lcd.print("VII");
+      lcd.print("VII ");
     break;
     case 8:
       lcd.print("VIII");
     break;
     case 9:
-      lcd.print("IX");
+      lcd.print("IX  ");
     break;
     case 10:
-      lcd.print("X");
+      lcd.print("X   ");
     break;
     case 11:
-      lcd.print("XI");
+      lcd.print("XI  ");
     break;
     case 12:
-      lcd.print("XII");
+      lcd.print("XII ");
     break;
   }
 }

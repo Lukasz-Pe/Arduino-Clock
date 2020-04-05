@@ -47,7 +47,13 @@ void setup() {
   Timer1.attachInterrupt(timerIsr);
   //Ustawienie ostatniej wartości enkodera
   last = encoder->getValue();
-  
+  t=rtc.getTime();
+  g=t.hour;
+  m=t.min;
+  s=t.sec;
+  dzi=t.date;
+  mie=t.mon;
+  rok=t.year;
   lcd.begin(20,4);
   CreateCustomChar(lcd);
   //setTime(g, m, s, dzi, mie, rok);
@@ -56,7 +62,8 @@ void setup() {
   //pinMode(rl, INPUT_PULLUP);
   //pinMode(rr, INPUT_PULLUP);
   //pinMode(res, INPUT_PULLUP);
-  pinMode(beep, OUTPUT);
+  //pinMode(beep, OUTPUT);
+  //digitalWrite(beep,LOW);
   //Serial.begin(9600);
 }
 
@@ -127,6 +134,7 @@ void showTime(){
 
 bool menu=false;
 int option=-1;
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 void loop() {
   t=rtc.getTime();
@@ -140,6 +148,10 @@ void loop() {
       middle=false;
       menu=true;
       lcd.clear();
+    }
+    if((t.hour==0)&&(t.min==0)&&(t.sec==0)/*||(digitalRead(res)==LOW)*/){
+      //digitalWrite(beep,HIGH);
+      resetFunc();
     }
   }else{
     readRotaryEncoder();
