@@ -1,22 +1,22 @@
-#Arduino based RTC
+# Arduino based RTC
 
 ![image](Zegar.jpg)
 
-##About
+## About
 This is simple clock project built to give second life to a damaged Prusa Printer clone board a second and purposeful life and relive my wife of loud ticking clock. :) 
 
-##Depencies and basic info
+## Dependencies and basic info
  - LiquidCrystal Library
  - Code is built for Arduino Mega or Mega 2560
  - LCD is 20x4 fields with rotary encoder and click (from Prusa Printer clone)
  
-##How to
+## How to
 - Clone
 - Adapt to your particular board
 - Translate menu entries
 - Compile and load to (wired) board!
 
-##Additional info
+## Additional info
 If you do not like the shape of numbers check the bigChar.h file, where all the segments are stored.
 
 Functions:
