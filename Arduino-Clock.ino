@@ -1,7 +1,7 @@
 #include "bigChar.h"
 #include "ClickEncoder.h"
 #include "TimerOne.h"
-#include<DS3231.h>
+#include "DS3231.h"
 
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
@@ -10,10 +10,20 @@ const int rs = 16, en = 17, d4 = 23, d5 = 25, d6 = 27, d7 = 29;
 DS3231 rtc(SDA,SCL);
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 int g=0,m=0,s=0,dzi=1,mie=1,rok=2020;
+/*time vars as follows
+ * 
+ * g- hour
+ * m - minute
+ * s - second
+ * dzi - day
+ * mie - month
+ * rok - year
+ * 
+ */
 int p=0;
 Time t;
 
-//Zmienne dla menu
+//menu variables
 int i=0;
 int menuitem = 0;
 int frame = 0;
@@ -25,11 +35,13 @@ bool down = false;
 bool middle = false;
 int lastSec=s;
 
-//Teksty dla menu:
+//Menu text:
 String menuItem[] = {"Ustaw rok","Ustaw m-c","Ustaw dzien","Ustaw godzine","Ustaw minute","Ustaw sekunde","Wyjdz"};
+//above in English:
+//String menuItem[] = {"Set year","Set month","Set day","Set hour","Set minute","Set second","Exit"};
 int menuItemSize=sizeof(menuItem)/sizeof(String);
 
-//Definicja enkodera
+//Rotary encoder definition
 ClickEncoder *encoder;
 int16_t last, value;
 
@@ -39,13 +51,13 @@ void timerIsr() {
 
 void setup() {
   rtc.begin();
-  //ustawienie enkodera
+  //encoder setup
   encoder = new ClickEncoder(rl, rr, ent);
   encoder->setAccelerationEnabled(false);
-  //ustawienie przerwań dla enkodera
+  //Encoder interrupt setup
   Timer1.initialize(1000);
   Timer1.attachInterrupt(timerIsr);
-  //Ustawienie ostatniej wartości enkodera
+  //Encoders last value setup
   last = encoder->getValue();
   t=rtc.getTime();
   g=t.hour;
@@ -56,18 +68,9 @@ void setup() {
   rok=t.year;
   lcd.begin(20,4);
   CreateCustomChar(lcd);
-  //setTime(g, m, s, dzi, mie, rok);
-  // Print a message to the LCD.
-  //pinMode(ent, INPUT_PULLUP);
-  //pinMode(rl, INPUT_PULLUP);
-  //pinMode(rr, INPUT_PULLUP);
-  //pinMode(res, INPUT_PULLUP);
-  //pinMode(beep, OUTPUT);
-  //digitalWrite(beep,LOW);
-  //Serial.begin(9600);
 }
 
-//Deklaracje potrzebnych funkcji
+//Forward declaration of functions
 void mainMenu();
 void displayMenuItem(const String& item, const int& posx, const int& posy, const bool& selected);
 void displayIntMenuPage(const String& menuItem, int& value);
@@ -124,9 +127,6 @@ void showTime(){
   lcd.setCursor(7,3);
   miesiac(lcd, t.mon);
   lcd.setCursor(13,3);
-//  lcd.print(t.year);
-//  lcd.setCursor(15,3);
-//  lcd.print("T=");
   lcd.print(rtc.getTemp());
   lcd.print((char)223);
   lcd.print("C");
@@ -149,8 +149,7 @@ void loop() {
       menu=true;
       lcd.clear();
     }
-    if((t.hour==0)&&(t.min==0)&&(t.sec==0)/*||(digitalRead(res)==LOW)*/){
-      //digitalWrite(beep,HIGH);
+    if((t.hour==0)&&(t.min==0)&&(t.sec==0)){
       delay(995);
       resetFunc();
     }
